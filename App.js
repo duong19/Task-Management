@@ -1,19 +1,53 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import {
+  createAppContainer,
+  createSwitchNavigator
+} from 'react-navigation'
+import {createStackNavigator} from 'react-navigation-stack';
+import { createBottomTabNavigator } from "react-navigation-tabs";
+import  SigninScreen from "./src/screens/SigninScreen";
+import  SignupScreen from "./src/screens/SignupScreen";
+import ResolveAuthScreen from './src/screens/ResolveAuthScreen'
+import TaskScreen from "./src/screens/TaskScreen";
+import TaskDetailScreen from "./src/screens/TaskDetailScreen";
+import TaskCreateScreen from "./src/screens/TaskCreateScreen";
 
-export default function App() {
+
+
+import  UserScreen from "./src/screens/UserScreen";
+import {Provider as AuthProvider} from "./src/context/authContext";
+import {Provider as TaskProvider } from "./src/context/taskContext";
+import { setNavigator } from "./src/navigationRef";
+import TaskUpdateScreen from './src/screens/TaskUpdateScreen';
+
+const switchNavigator = createSwitchNavigator({
+  ResolveAuth: ResolveAuthScreen,
+  loginFlow: createStackNavigator({
+    Signin: SigninScreen,
+    Signup: SignupScreen
+  }),
+  mainFlow: createBottomTabNavigator({
+    TaskFlow: createStackNavigator({
+      TaskList: TaskScreen,
+      TaskEdit: TaskDetailScreen,
+      TaskCreate: TaskCreateScreen,
+      TaskUpdate: TaskUpdateScreen
+    }),
+    UserFlow: createStackNavigator({
+      UserInfo: UserScreen
+    })
+  })
+})
+
+const App = createAppContainer(switchNavigator)
+
+export default () => {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-    </View>
-  );
+    <AuthProvider>
+      <TaskProvider>
+      <App ref={(navigator) => {setNavigator(navigator)}}/>
+      </TaskProvider>
+    </AuthProvider>
+  )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
