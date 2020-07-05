@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
-import { TouchableOpacity } from "react-native-gesture-handler";
+
 import { Context as TaskContext } from "../context/taskContext";
 
 const TaskItem = props => {

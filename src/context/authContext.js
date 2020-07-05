@@ -9,11 +9,11 @@ const authReducer = (state, action) => {
         case 'add_error':
             return {...state, errorMessage: action.payload}
         case "signin":
-            return {errorMessage: '', token: action.payload.token, role: action.payload.role}
+            return {errorMessage: '', token: action.payload.token, role: action.payload.role, userId: action.payload.userId}
         case "clear_error_msg":
             return {...state, errorMessage: ''}
         case 'signout':
-            return {token: null, errorMessage: '', role: null}
+            return {token: null, errorMessage: '', role: null, userId: null}
         default:
             return state
     }
@@ -23,13 +23,16 @@ const clearErrorMessage = dispatch => {
     return ()=>{ dispatch({type: 'clear_error_msg'})}
 }
 
+
+
 const tryLocalSignIn = dispatch => {
     return async ()=>{
         const token = await AsyncStorage.getItem('token')
         const role = await AsyncStorage.getItem('role')
-        console.log(token)
-        if (token && role) {
-            dispatch({type: 'signin', payload: {token, role}})
+        const id = await AsyncStorage.getItem('userId')
+        console.log(id)
+        if (token && role && id) {
+            dispatch({type: 'signin', payload: {token, role, userId: id}})
             navigate('mainFlow')
         } else {
             navigate('Signin')
@@ -41,10 +44,10 @@ const signup = dispatch => {
     return async ({username, password, fullName, role, gender, age}) => {
         try {
             const res = await userAPI.post('/signup', {username, password, isAdmin: role, fullName, age, isMale: gender})
-            console.log("H")
             await AsyncStorage.setItem('token', res.data.token)
             res.data.isAdmin === true ? await AsyncStorage.setItem('role', 'admin') : await AsyncStorage.setItem('role', 'user')
-            dispatch({type: 'signin', payload: {token: res.data.token, role: (res.data.isAdmin === true ? 'admin' : 'user')}})
+            await AsyncStorage.setItem('userId', res.data.userId)
+            dispatch({type: 'signin', payload: {token: res.data.token, role: (res.data.isAdmin === true ? 'admin' : 'user'), userId: res.data.userId}})
 
             navigate('TaskList')
         }catch(err){
@@ -60,9 +63,10 @@ const signin = dispatch => {
             await AsyncStorage.setItem('token', res.data.token)
 
             res.data.isAdmin === true ? await AsyncStorage.setItem('role', 'admin') : await AsyncStorage.setItem('role', 'user')
+            await AsyncStorage.setItem('userId', res.data.userId)
 
 
-            dispatch({type: 'signin', payload: {token: res.data.token, role: (res.data.isAdmin === true ? 'admin' : 'user')}})
+            dispatch({type: 'signin', payload: {token: res.data.token, role: (res.data.isAdmin === true ? 'admin' : 'user'), userId: res.data.userId}})
             navigate('TaskList')
         }catch(err){
             dispatch({type: 'add_error', payload: 'Something went wrong with sign in'})
@@ -74,6 +78,7 @@ const signout = dispatch => {
     return async () => {
         await AsyncStorage.removeItem('token')
         await AsyncStorage.removeItem('role')
+        await AsyncStorage.removeItem('userId')
         dispatch({type: 'signout'})
         navigate('loginFlow')
     }
@@ -84,5 +89,5 @@ const signout = dispatch => {
 export const {Provider, Context} = createDataContext(
     authReducer,
     {signup, signin, clearErrorMessage, tryLocalSignIn, signout},
-    { token: null, errorMessage: '',role: null}
+    { token: null, errorMessage: '',role: null, userId: null}
 )

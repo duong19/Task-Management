@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react"
-import {View, StyleSheet} from 'react-native'
+import {View, StyleSheet, Picker} from 'react-native'
 import { SafeAreaView } from "react-navigation";
 import { Button, Text, Input } from 'react-native-elements';
 import { TouchableOpacity } from 'react-native-gesture-handler'
@@ -29,20 +29,23 @@ const TaskDetailScreen = ({navigation}) => {
             label="Description"
             value={description}
             onChangeText={newDescription => setDescription(newDescription)} />
+        <Picker selectedValue={isFinished}
+                style={{ height: 50, width: 300, borderRadius: 5, borderWidth: 4, borderColor: "rgba(172,172,172,0.7)" }}
+        onValueChange={(itemValue, itemIndex) => {
+            setIsFinished(itemValue)}} >
+            <Picker.Item label="Finished" value={true}/>
+            <Picker.Item label="Unfinished" value={false}/>
+        </Picker>
         <TouchableOpacity style={styles.button} onPress={()=>editTask({_id: thisTask._id, name, description, isFinished})}>
           
-          <Text style={{ color: "#FFF" }}>Submit</Text>
+        <Text style={{ color: "#FFF" }}>Submit</Text>
   
       </TouchableOpacity>
         </View>
     )
 
 }
-TaskDetailScreen.navigationOptions = ({navigation}) => {
-    return {
-        title: "Edit Task"
-    }
-}
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
