@@ -41,9 +41,9 @@ const tryLocalSignIn = dispatch => {
 }
 
 const signup = dispatch => {
-    return async ({username, password, fullName, role, gender, age}) => {
+    return async ({username, password, fullName, role, gender, age, department}) => {
         try {
-            const res = await userAPI.post('/signup', {username, password, isAdmin: role, fullName, age, isMale: gender})
+            const res = await userAPI.post('/signup', {username, password, isAdmin: role, fullName, age, isMale: gender, department})
             await AsyncStorage.setItem('token', res.data.token)
             res.data.isAdmin === true ? await AsyncStorage.setItem('role', 'admin') : await AsyncStorage.setItem('role', 'user')
             await AsyncStorage.setItem('userId', res.data.userId)
@@ -59,8 +59,8 @@ const signin = dispatch => {
     return async ({username, password}) => {
         try {
             const res = await userAPI.post('/signin', {username, password})
-            console.log(res)
             await AsyncStorage.setItem('token', res.data.token)
+            console.log(res.data)
 
             res.data.isAdmin === true ? await AsyncStorage.setItem('role', 'admin') : await AsyncStorage.setItem('role', 'user')
             await AsyncStorage.setItem('userId', res.data.userId)
@@ -69,6 +69,7 @@ const signin = dispatch => {
             dispatch({type: 'signin', payload: {token: res.data.token, role: (res.data.isAdmin === true ? 'admin' : 'user'), userId: res.data.userId}})
             navigate('TaskList')
         }catch(err){
+            console.log(err)
             dispatch({type: 'add_error', payload: 'Something went wrong with sign in'})
         }
     }

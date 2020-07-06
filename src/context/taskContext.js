@@ -20,8 +20,12 @@ const taskReducer = (state, action) => {
 
 const getTask = dispatch => {
     return async () => {
+        try{
             const res = await taskAPI.get('/tasks')
             dispatch({type: 'list_task', payload: res.data})
+        }catch(err){
+            console.log(err)
+        }
         
     }
 }

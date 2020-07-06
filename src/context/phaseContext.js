@@ -6,19 +6,34 @@ import { navigate } from "../navigationRef";
 
 const phaseReducer = (state, action) => {
     switch (action.type) {
-        // case 'create_phase':
-        //     return {phases: [...state.phases, action.payload]}
+        case 'create_phase':
+            return {phases: [...state.phases, action.payload]}
         case 'get_phases':
             return {phases: action.payload}
+        case 'delete_phase':
+            return {phases: state.phases.filter(phase => phase._id !== action.payload)}
+        case 'update_phase':
+            return {phases: state.phases.map(phase => phase._id === action.payload._id ? action.payload : phase)}
         default:
             return state
     }
 }
 
-const createPhase = dispatch => {
-    return async ({taskId, name, description}) => {
+const deletePhase = dispatch => {
+    return async (taskId) => {
         try {
-            const res = await phaseAPI.post('/phases', {name, description, taskId})
+            const res = await phaseAPI.delete(`/phases/${taskId}`)
+            dispatch({type: 'delete_phase', payload: taskId})
+        }catch(err){
+            console.log(err)
+        }
+    }
+}
+
+const createPhase = dispatch => {
+    return async ({taskId, name, description, userId}) => {
+        try {
+            const res = await phaseAPI.post('/phases', {name, description, taskId, userId})
             console.log(res.data)
             dispatch({type: 'create_phase', payload: res.data})
             navigate('PhaseList')
@@ -37,10 +52,21 @@ const getPhases = dispatch => {
         }
     }
 }
+const updatePhase = dispatch => {
+    return async ({phaseId, name, description, isFinished, userId, taskId}) => {
+        try {
+        const res = await phaseAPI.put(`/phases/${phaseId}`, { name, description, isFinished, userId, taskId})
+        console.log(res.data)
+        dispatch({type: 'update_phase', payload: res.data})
+        }catch (err){
+            console.log(err)
+        }
 
+    }
+}
 
 export const {Provider, Context} = createDataContext(
     phaseReducer,
-    {getPhases, createPhase},
+    {getPhases, createPhase, deletePhase, updatePhase},
     {phases: []}
 )

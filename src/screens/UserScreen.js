@@ -7,16 +7,21 @@ import {Context as UserContext} from '../context/userContext'
 import {EvilIcons} from '@expo/vector-icons'
 import { NavigationEvents } from "react-navigation";
 import InfoField from "../components/InfoField";
+import {Context as DepartmentContext} from '../context/departmentContext'
 
 const UserScreen  = ({navigation}) => {
     const {state: {userId}, signout} = useContext(AuthContext)
     const {state ,getUser} = useContext(UserContext)
 // const {fullName, age, isMale} = state.user
-    
+    const {state: {departments}, getDepartment} = useContext(DepartmentContext)
+
+    // let dep
+    // const dep = departments.find( item => item._id === state.user.department)
     return (
         <View style={{marginTop: 30}}>
-            <NavigationEvents onWillFocus={() => getUser(userId)}/>
-            {console.log(state)}
+            <NavigationEvents onWillFocus={() => {getUser(userId)
+            getDepartment()}}
+            />
         { state.user ? 
         (
         <View style={{flexDirection: 'row', margin: 15}}>
@@ -28,6 +33,8 @@ const UserScreen  = ({navigation}) => {
             <InfoField label='Full Name' data={state.user.fullName}/>
             <InfoField label='Age' data={state.user.age}/>
             <InfoField label='Gender' data={state.user.isMale ? "Male" : "Female"}/>
+            {state.user.department ? (<InfoField label='Department' data={departments.find( item => item._id === state.user.department).name}/>) : null}
+
             <InfoField label='Role' data={state.user.isAdmin ? "Admin" : "User"}/>
 
         </View>

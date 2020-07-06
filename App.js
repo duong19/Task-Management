@@ -20,6 +20,7 @@ import {Provider as AuthProvider} from "./src/context/authContext";
 import {Provider as TaskProvider } from "./src/context/taskContext";
 import {Provider as UserProvider } from "./src/context/userContext";
 import {Provider as PhaseProvider } from "./src/context/phaseContext";
+import {Provider as DepartmentProvider } from "./src/context/departmentContext";
 
 import { setNavigator } from "./src/navigationRef";
 import TaskUpdateScreen from './src/screens/TaskUpdateScreen';
@@ -27,6 +28,7 @@ import TaskInfoScreen from './src/screens/TaskInfoScreen';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {EvilIcons} from '@expo/vector-icons'
 import PhaseCreateScreen from './src/screens/PhaseCreateScreen';
+import PhaseUpdateScreen from './src/screens/PhaseUpdateScreen';
 
 const switchNavigator = createSwitchNavigator({
   ResolveAuth: ResolveAuthScreen,
@@ -42,7 +44,8 @@ const switchNavigator = createSwitchNavigator({
       TaskCreate: TaskCreateScreen,
       TaskUpdate: TaskUpdateScreen,
       PhaseList: TaskInfoScreen,
-      PhaseCreate: PhaseCreateScreen
+      PhaseCreate: PhaseCreateScreen,
+      PhaseUpdate: PhaseUpdateScreen
     }),
     navigationOptions: {
       tabBarIcon: ({tintColor}) => {
@@ -76,6 +79,7 @@ const App = createAppContainer(switchNavigator)
 
 export default () => {
   return (
+    <DepartmentProvider>
     <AuthProvider>
       <UserProvider>
       <TaskProvider>
@@ -85,5 +89,7 @@ export default () => {
       </TaskProvider>
       </UserProvider>
     </AuthProvider>
+    </DepartmentProvider>
+
   )
 }

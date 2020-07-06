@@ -9,13 +9,12 @@ import { NavigationEvents } from "react-navigation";
 
 
 const PhaseItem = props => {
-    const {name, description, userId, taskId, isFinished} = props
+    const {name, description, userId, taskId, isFinished, _id, navigation} = props
     const [username, setUsername] = useState('')
+    const {deletePhase} = useContext(PhaseContext)
     // const [userID, setUserID] = useState(userId ? userId : '')
     const getReponse = async () => {
-        console.log(userId)
         const res = await userAPI.get(`users/${userId}`)
-        console.log(res.data)
         setUsername(res.data.fullName) }
       
          useEffect(() => { if(userId) {getReponse()}})
@@ -58,10 +57,10 @@ const PhaseItem = props => {
             <Text style={styles.bodyText}>{username}</Text>
             <View style={{flexDirection: "row", justifyContent: "space-between"}}>
                 
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('PhaseUpdate', {phaseId: _id})}>
                     <Feather size={30} name="edit" color="blue"/>
                 </TouchableOpacity>
-                <TouchableOpacity >
+                <TouchableOpacity onPress={() => deletePhase(_id)}>
                     <Feather size={30} name="trash" color="red"/>
                 </TouchableOpacity>
             </View>
