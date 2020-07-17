@@ -30,7 +30,6 @@ const tryLocalSignIn = dispatch => {
         const token = await AsyncStorage.getItem('token')
         const role = await AsyncStorage.getItem('role')
         const id = await AsyncStorage.getItem('userId')
-        console.log(id)
         if (token && role && id) {
             dispatch({type: 'signin', payload: {token, role, userId: id}})
             navigate('mainFlow')
@@ -60,7 +59,6 @@ const signin = dispatch => {
         try {
             const res = await userAPI.post('/signin', {username, password})
             await AsyncStorage.setItem('token', res.data.token)
-            console.log(res.data)
 
             res.data.isAdmin === true ? await AsyncStorage.setItem('role', 'admin') : await AsyncStorage.setItem('role', 'user')
             await AsyncStorage.setItem('userId', res.data.userId)

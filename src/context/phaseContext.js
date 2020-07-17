@@ -10,6 +10,8 @@ const phaseReducer = (state, action) => {
             return {phases: [...state.phases, action.payload]}
         case 'get_phases':
             return {phases: action.payload}
+        case 'get_phases_user':
+            return {phases: action.payload}
         case 'delete_phase':
             return {phases: state.phases.filter(phase => phase._id !== action.payload)}
         case 'update_phase':
@@ -52,11 +54,20 @@ const getPhases = dispatch => {
         }
     }
 }
+const getPhasesByUser = dispatch => {
+    return async (userId) => {
+        try {
+        const res = await phaseAPI.get(`/phases?userId=${userId}`)
+        dispatch({type: 'get_phases_user', payload: res.data})
+        }catch (err){
+            console.log(err)
+        }
+    }
+}
 const updatePhase = dispatch => {
     return async ({phaseId, name, description, isFinished, userId, taskId}) => {
         try {
         const res = await phaseAPI.put(`/phases/${phaseId}`, { name, description, isFinished, userId, taskId})
-        console.log(res.data)
         dispatch({type: 'update_phase', payload: res.data})
         }catch (err){
             console.log(err)
@@ -67,6 +78,6 @@ const updatePhase = dispatch => {
 
 export const {Provider, Context} = createDataContext(
     phaseReducer,
-    {getPhases, createPhase, deletePhase, updatePhase},
+    {getPhases, createPhase, deletePhase, updatePhase, getPhasesByUser},
     {phases: []}
 )

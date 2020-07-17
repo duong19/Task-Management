@@ -1,24 +1,40 @@
 import React, { useContext, useState, useEffect } from "react";
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Context as PhaseContext } from "../context/phaseContext";
+import { Context as AuthContext } from "../context/authContext";
+
 import userAPI from "../api/task";
 import { NavigationEvents } from "react-navigation";
 
 
 
 const PhaseItem = props => {
-    const {name, description, userId, taskId, isFinished, _id, navigation} = props
+    const {name, description, userID, taskId, isFinished, _id, navigation, role, screen} = props
     const [username, setUsername] = useState('')
     const {deletePhase} = useContext(PhaseContext)
+    const {state: {userId}} = useContext(AuthContext)
     // const [userID, setUserID] = useState(userId ? userId : '')
     const getReponse = async () => {
-        const res = await userAPI.get(`users/${userId}`)
+        const res = await userAPI.get(`users/${userID}`)
         setUsername(res.data.fullName) }
       
-         useEffect(() => { if(userId) {getReponse()}})
-      
+        useEffect(() => { if(userID) {getReponse()}})
+    const createTwoButtonAlert = (phaseId) =>
+        Alert.alert(
+          "Confirm Delete",
+          "Do you want to delete this phase?",
+          [
+            {
+              text: "Cancel",
+              onPress: () => console.log("Cancel Pressed"),
+              style: "cancel"
+            },
+            { text: "OK", onPress: () => deletePhase(phaseId) }
+          ],
+          { cancelable: false }
+        );
     return (
         <View style={{flexDirection: 'row'}}>
         <View style={styles.cardContainer}>
@@ -53,18 +69,26 @@ const PhaseItem = props => {
             </View>
 
             </View>
-            <Text style={styles.bodyText}>{description}</Text>
-            <Text style={styles.bodyText}>{username}</Text>
-            <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+            <View style={{paddingVertical: 10}}>
+            <Text style={{fontWeight: 'bold'}}>Description: </Text>
+            <Text style={{color: 'black'}}>{description}</Text>
+            </View>
+            <View style={{flexDirection: 'row', paddingVertical: 10}}>
+            <Text style={{fontWeight: 'bold'}}>Assigned to: </Text>
+            <Text style={{color: 'black'}}>{username}</Text>
+            </View>
+            {screen !== 'list' ? (<View style={{flexDirection: "row", justifyContent: "space-between"}}>
                 
-                <TouchableOpacity onPress={() => navigation.navigate('PhaseUpdate', {phaseId: _id})}>
+                <TouchableOpacity onPress={() => {if((userID === userId || role==="admin") && screen !== 'list') {
+                  navigation.navigate('PhaseUpdate', {phaseId: _id})}
+                  }}>
                     <Feather size={30} name="edit" color="blue"/>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => deletePhase(_id)}>
+                {role === "admin" && screen !== 'list' ? (<TouchableOpacity onPress={() => createTwoButtonAlert(_id)}>
                     <Feather size={30} name="trash" color="red"/>
-                </TouchableOpacity>
-            </View>
-            </View>
+                </TouchableOpacity>) : null }
+            </View>) : null}
+            </View> 
         </View>
         </View>
     )

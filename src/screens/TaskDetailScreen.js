@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react"
-import {View, StyleSheet, Picker} from 'react-native'
-import { SafeAreaView } from "react-navigation";
+import {View, StyleSheet, Picker, ScrollView} from 'react-native'
+import { SafeAreaView} from "react-navigation";
 import { Button, Text, Input } from 'react-native-elements';
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import {EvilIcons} from '@expo/vector-icons'
@@ -21,6 +21,7 @@ const TaskDetailScreen = ({navigation}) => {
     const [isFinished,setIsFinished] = useState(thisTask.isFinished)
     return(
         <View style={styles.container}>
+        <ScrollView showsVerticalScrollIndicator={false}>
         <InputField
             label="Task name"
             value={name}
@@ -29,18 +30,21 @@ const TaskDetailScreen = ({navigation}) => {
             label="Description"
             value={description}
             onChangeText={newDescription => setDescription(newDescription)} />
+        <View style={{ height: 50, width: 350, borderRadius: 5, borderWidth: 2, borderColor: "rgba(172,172,172,0.7)" }}>
         <Picker selectedValue={isFinished}
-                style={{ height: 50, width: 300, borderRadius: 5, borderWidth: 4, borderColor: "rgba(172,172,172,0.7)" }}
+                style={{ height: 50, width: 350, borderRadius: 5, borderWidth: 4, borderColor: "rgba(172,172,172,0.7)" }}
         onValueChange={(itemValue, itemIndex) => {
             setIsFinished(itemValue)}} >
-            <Picker.Item label="Finished" value={true}/>
-            <Picker.Item label="Unfinished" value={false}/>
+            <Picker.Item label="Finished" value={true} color="red"/>
+            <Picker.Item label="Unfinished" value={false} color="red"/>
         </Picker>
+        </View>
         <TouchableOpacity style={styles.button} onPress={()=>editTask({_id: thisTask._id, name, description, isFinished})}>
           
         <Text style={{ color: "#FFF" }}>Submit</Text>
   
       </TouchableOpacity>
+      </ScrollView>
         </View>
     )
 
@@ -55,6 +59,7 @@ const styles = StyleSheet.create({
       },
       button: {
         margin: 10,
+        marginHorizontal: 100,
         paddingHorizontal: 30,
         paddingVertical: 12, 
         width: "40%",

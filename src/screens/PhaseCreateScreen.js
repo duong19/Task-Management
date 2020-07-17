@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react"
-import {View, StyleSheet, Picker} from 'react-native'
+import {View, StyleSheet, Picker, ScrollView} from 'react-native'
 import { SafeAreaView, NavigationActions, NavigationEvents } from "react-navigation";
 import { Button, Text, Input } from 'react-native-elements';
 import { TouchableOpacity } from 'react-native-gesture-handler'
@@ -13,7 +13,6 @@ import {Context as DepartmentContext} from '../context/departmentContext'
 const PhaseCreateScreen = ({navigation}) => {
     const taskId =navigation.getParam('taskId')
 
-    console.log(taskId)
     const {createPhase} = useContext(PhaseContext)
     const {state, getUserList} = useContext(UserContext)
     const {state: {departments}, getDepartment} = useContext(DepartmentContext)
@@ -23,6 +22,7 @@ const PhaseCreateScreen = ({navigation}) => {
     const [department, setDepartment] = useState('')
     return(
         <View style={styles.container}>
+        <ScrollView showsVerticalScrollIndicator={false}>
         <NavigationEvents onWillFocus={() => {getUserList()
         getDepartment()}}/>
         <InputField
@@ -33,9 +33,10 @@ const PhaseCreateScreen = ({navigation}) => {
             label="Description"
             value={description}
             onChangeText={newDescription => setDescription(newDescription)} />
+        <View  style={{ height: 50, width: 350, borderRadius: 5, borderWidth: 2, borderColor: "rgba(172,172,172,0.7)", marginBottom: 10 }}>
         <Picker 
             selectedValue={department}
-            style={{ height: 50, width: 300, borderRadius: 5, borderWidth: 4, borderColor: "rgba(172,172,172,0.7)" }}
+            style={{ height: 50, width: 350, borderRadius: 5, borderWidth: 2, borderColor: "rgba(172,172,172,0.7)" }}
             onValueChange={(itemValue, itemIndex) => { if(itemValue !== ""){
             setDepartment(itemValue)}}}>
             <Picker.Item label="Select department" value='' color='red'/>
@@ -43,9 +44,11 @@ const PhaseCreateScreen = ({navigation}) => {
         <Picker.Item label="Loading..." value="" />
     )}
         </Picker>
+        </View>
+        <View  style={{ height: 50, width: 350, borderRadius: 5, borderWidth: 2, borderColor: "rgba(172,172,172,0.7)" }}>
         <Picker 
             selectedValue={userId}
-            style={{ height: 50, width: 300, borderRadius: 5, borderWidth: 4, borderColor: "rgba(172,172,172,0.7)" }}
+            style={{ height: 50, width: 350, borderRadius: 5, borderWidth: 2, borderColor: "rgba(172,172,172,0.7)" }}
             onValueChange={(itemValue, itemIndex) => { if(itemValue !== ""){
             setUserID(itemValue)}}}>
             <Picker.Item label="Select user" value='' color='red'/>
@@ -53,10 +56,12 @@ const PhaseCreateScreen = ({navigation}) => {
         <Picker.Item label="Loading..." value="" />
     )}
         </Picker>
+        </View>
         <TouchableOpacity style={styles.button} onPress={()=>createPhase({name, description, taskId, userId})}>
           <Text style={{ color: "#FFF" }}>Submit</Text>
   
       </TouchableOpacity>
+        </ScrollView>
         </View>
       
     )
@@ -71,6 +76,7 @@ const styles = StyleSheet.create({
       },
       button: {
         margin: 10,
+        marginHorizontal: 110,
         paddingHorizontal: 30,
         paddingVertical: 12, 
         width: "40%",

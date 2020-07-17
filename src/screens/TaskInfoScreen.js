@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from "react"
-import {View, StyleSheet, TouchableOpacity} from 'react-native'
+import {View, StyleSheet, TouchableOpacity, Alert, ActivityIndicator} from 'react-native'
 import { SafeAreaView } from "react-navigation";
 import { Button, Text, Input, SearchBar } from 'react-native-elements';
 import {FlatList } from 'react-native-gesture-handler'
@@ -19,7 +19,10 @@ const TaskInfoScreen = ({navigation}) => {
 
     const {state, getPhases} = useContext(PhaseContext)
     const taskId = navigation.getParam('taskId')
+    const role = navigation.getParam('role')
     const [textInput, setTextInput] = useState('')
+    const [loading, setLoading] = useState(true)
+    let isMounted = false
 
     // useEffect(() => {
     //     getPhases(taskId)
@@ -27,9 +30,11 @@ const TaskInfoScreen = ({navigation}) => {
     // })
     // console.log(state)
     // const taskId = navigation.getParam('taskId')
+    // const [data, setData] = useState(state.phases)
     return (
         <View >
-            <NavigationEvents onWillFocus={() => {getPhases(taskId)}}/>
+            <NavigationEvents onWillFocus={() => {isMounted = true
+            getPhases(taskId).then(result => {if (isMounted) {setLoading(false)}}) }} onWillBlur={isMounted=false}/>
             <View style={{flexDirection: 'row', margin: 10}}>
             <SearchBar 
                 value={textInput}
@@ -37,21 +42,21 @@ const TaskInfoScreen = ({navigation}) => {
                 placeholder={'Search'}
                 inputStyle={{backgroundColor: 'white'}} inputContainerStyle={{backgroundColor:"white"}}
                 containerStyle={{flex : 3, backgroundColor: 'white', borderWidth: 1, borderRadius: 5}}/>
-            <TouchableOpacity style={{margin: 10}} onPress={() => { navigation.navigate('PhaseCreate', {taskId: taskId}) }}>
+         {role === "admin" ? (<TouchableOpacity style={{margin: 10}} onPress={() => { navigation.navigate('PhaseCreate', {taskId: taskId}) }}>
                 <Icon name="pluscircleo" size={40} color='blue'/>
-            </TouchableOpacity>
+            </TouchableOpacity>) : null}
             </View>
             
-            {state ? (<FlatList
+            {!loading ? (<FlatList
                 showsVerticalScrollIndicator={false}
-                style={{margin: 10, height: 500}} 
+                style={{margin: 10, height: 520}} 
                 data={textInput !== '' ? (state.phases.filter(item => item.name.includes(textInput))) : state.phases}
                 keyExtractor={item => item._id}
                 renderItem={({item}) => {
                     return (
-                        <PhaseItem name={item.name} description={item.description} isFinished={item.isFinished} _id={item._id} navigation={navigation} userId={item.userId}  />
+                        <PhaseItem name={item.name} description={item.description} isFinished={item.isFinished} _id={item._id} navigation={navigation} userID={item.userId} role={role} screen='' />
                     )
-                }}/>) : null }
+                }}/>) : <ActivityIndicator size="large" /> }
             
             
         </View>
@@ -61,7 +66,7 @@ const TaskInfoScreen = ({navigation}) => {
 
 TaskInfoScreen.navigationOptions = ({navigation}) => {
     return {
-        title: "Phase List"
+        title: navigation.getParam("taskName")
     }
 }
 
